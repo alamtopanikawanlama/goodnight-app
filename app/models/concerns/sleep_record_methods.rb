@@ -11,7 +11,7 @@ module SleepRecordMethods
 
   def duration_in_hours
     return nil unless clock_out_at
-    (clock_out_at - clock_in_at) / 1.hour
+    ((clock_out_at - clock_in_at) / 1.hour).round(2)
   end
 
   def completed?
