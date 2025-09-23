@@ -18,6 +18,15 @@ RSpec.configure do |config|
   # Include FactoryBot methods
   config.include FactoryBot::Syntax::Methods
   
+  # Configure spec types
+  config.define_derived_metadata(file_path: %r{/spec/services/}) do |metadata|
+    metadata[:type] = :service
+  end
+  
+  config.define_derived_metadata(file_path: %r{/spec/serializers/}) do |metadata|
+    metadata[:type] = :serializer
+  end
+  
   # Database cleaner configuration
   config.before(:suite) do
     DatabaseCleaner.strategy = :transaction
