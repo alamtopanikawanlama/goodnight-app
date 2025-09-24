@@ -16,6 +16,19 @@ Rails.application.routes.draw do
           get :followers
           get :following
         end
+        
+        # Nested sleep records routes
+        resources :sleep_records, except: [:create, :update] do
+          collection do
+            post :clock_in
+            get :current
+            get :friends
+          end
+          
+          member do
+            patch :clock_out
+          end
+        end
       end
       
       # Standalone follows routes
