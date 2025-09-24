@@ -17,6 +17,9 @@ Rails.application.routes.draw do
           get :following
         end
       end
+      
+      # Standalone follows routes
+      resources :follows, only: [:index, :show, :create, :destroy]
     end
   end
 end
