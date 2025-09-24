@@ -1,54 +1,53 @@
 class Api::V1::FollowsController < Api::V1::BaseController
   # GET /api/v1/follows
   def index
-    result = FollowService.find_all(params)
-    
-    if result.success?
-      response_data = {
-        follows: ActiveModelSerializers::SerializableResource.new(result.data, each_serializer: FollowSerializer),
-        pagination: result.meta
-      }
-      render json: response_data
-      return
+    cache_key = "follows/index/#{params.to_unsafe_h.to_param}"
+    render_cached_or_fresh(cache_key) do
+      result = FollowService.find_all(params)
+      if result.success?
+        {
+          follows: ActiveModelSerializers::SerializableResource.new(result.data, each_serializer: FollowSerializer).as_json,
+          pagination: result.meta
+        }
+      else
+        render_error(result.message) and return
+      end
     end
-    
-    render_error(result.message)
   end
 
   # GET /api/v1/follows/:id
   def show
-    result = FollowService.find_by_id(params[:id])
-    
-    if result.success?
-      render json: result.data, serializer: FollowSerializer
-      return
+    cache_key = "follows/show/#{params[:id]}"
+    render_cached_or_fresh(cache_key) do
+      result = FollowService.find_by_id(params[:id])
+      if result.success?
+        ActiveModelSerializers::SerializableResource.new(result.data, serializer: FollowSerializer).as_json
+      else
+        render_error(result.message, :not_found) and return
+      end
     end
-    
-    render_error(result.message, :not_found)
   end
 
   # POST /api/v1/follows
   def create
     result = FollowService.create(follow_params)
-    
+    Rails.cache.delete_matched("follows/*")
     if result.success?
       render json: result.data, serializer: FollowSerializer, status: :created
-      return
+    else
+      render_error(result.message, :unprocessable_entity, result.errors)
     end
-    
-    render_error(result.message, :unprocessable_entity, result.errors)
   end
 
   # DELETE /api/v1/follows/:id
   def destroy
     result = FollowService.destroy(params[:id])
-    
+    Rails.cache.delete_matched("follows/*")
     if result.success?
       render_success(nil, result.message)
-      return
+    else
+      render_error(result.message, :not_found)
     end
-    
-    render_error(result.message, :not_found)
   end
 
   private
