@@ -2,10 +2,13 @@ default: &default
   adapter: postgresql
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   timeout: 5000
+  username: <%= ENV.fetch("DATABASE_USERNAME", "goodnight_app") %>
+  password: <%= ENV.fetch("DATABASE_PASSWORD", "examplepassword") %>
+  host: <%= ENV.fetch("DATABASE_HOST", "db") %>
 
 development:
   <<: *default
-  database: goodnight_app_dev
+  database: <%= ENV.fetch("DATABASE_NAME", "goodnight_app_development") %>
 
 test:
   <<: *default
