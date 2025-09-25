@@ -6,7 +6,9 @@ class Api::V1::SleepRecordsController < Api::V1::BaseController
       result = SleepRecordService.find_all_by_user(
         params[:user_id], 
         page: params[:page], 
-        per_page: params[:per_page]
+        per_page: params[:per_page],
+        start_date: params[:start_date],
+        end_date: params[:end_date]
       )
       if result.success?
         {
@@ -74,7 +76,9 @@ class Api::V1::SleepRecordsController < Api::V1::BaseController
       result = SleepRecordService.get_friends_records(
         params[:user_id],
         page: params[:page],
-        per_page: params[:per_page]
+        per_page: params[:per_page],
+        start_date: params[:start_date],
+        end_date: params[:end_date]
       )
       if result.success?
         {

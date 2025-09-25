@@ -8,11 +8,23 @@ RSpec.describe 'SleepRecords API', type: :request do
       parameter name: :user_id, in: :path, type: :string
       parameter name: :page, in: :query, type: :integer, required: false
       parameter name: :per_page, in: :query, type: :integer, required: false
+      parameter name: :start_date, in: :query, type: :string, format: :date, required: false
+      parameter name: :end_date, in: :query, type: :string, format: :date, required: false
 
       response '200', 'sleep records found' do
         let(:user_id) { User.create(name: 'Test User').id }
+        let(:start_date) { 2.days.ago.to_date.to_s }
+        let(:end_date) { Date.today.to_s }
+        before do
+          SleepRecord.create(user_id: user_id, clock_in_at: 2.days.ago)
+          SleepRecord.create(user_id: user_id, clock_in_at: 1.day.ago)
+          SleepRecord.create(user_id: user_id, clock_in_at: Date.today)
+        end
         run_test! do |response|
           expect(response.status).to eq(200)
+          data = JSON.parse(response.body)
+          expect(data).to have_key('sleep_records')
+          expect(data).to have_key('pagination')
         end
       end
 
@@ -174,12 +186,24 @@ RSpec.describe 'SleepRecords API', type: :request do
       parameter name: :user_id, in: :path, type: :string
       parameter name: :page, in: :query, type: :integer, required: false
       parameter name: :per_page, in: :query, type: :integer, required: false
+      parameter name: :start_date, in: :query, type: :string, format: :date, required: false
+      parameter name: :end_date, in: :query, type: :string, format: :date, required: false
 
       response '200', 'friends sleep records found' do
         let(:user_id) { User.create(name: 'Test User').id }
-
+        let(:friend) { User.create(name: 'Friend User') }
+        let(:start_date) { 2.days.ago.to_date.to_s }
+        let(:end_date) { Date.today.to_s }
+        before do
+          Follow.create(follower_id: user_id, following_id: friend.id)
+          SleepRecord.create(user_id: friend.id, clock_in_at: 2.days.ago)
+          SleepRecord.create(user_id: friend.id, clock_in_at: Date.today)
+        end
         run_test! do |response|
           expect(response.status).to eq(200)
+          data = JSON.parse(response.body)
+          expect(data).to have_key('friends_sleep_records')
+          expect(data).to have_key('pagination')
         end
       end
     end

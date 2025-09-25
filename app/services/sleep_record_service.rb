@@ -1,8 +1,17 @@
 class SleepRecordService < BaseService
   class << self
-    def find_all_by_user(user_id, page: nil, per_page: 20)
+    def find_all_by_user(user_id, page: nil, per_page: 20, start_date: nil, end_date: nil)
       user = User.find(user_id)
       sleep_records = user.sleep_records.includes(:user).order(created_at: :desc)
+
+      if start_date.present? && end_date.present?
+        sleep_records = sleep_records.where(clock_in_at: start_date..end_date)
+      elsif start_date.present?
+        sleep_records = sleep_records.where('clock_in_at >= ?', start_date)
+      elsif end_date.present?
+        sleep_records = sleep_records.where('clock_in_at <= ?', end_date)
+      end
+
       page = page || 1
       paginated_sleep_records = sleep_records.page(page).per(per_page)
       
@@ -71,13 +80,21 @@ class SleepRecordService < BaseService
       ServiceResult.new(success: false, message: e.message)
     end
 
-    def get_friends_records(user_id, page: nil, per_page: 20)
+    def get_friends_records(user_id, page: nil, per_page: 20, start_date: nil, end_date: nil)
       user = User.find(user_id)
       page = page || 1
       per_page = per_page || 20
       
-      # Get the ActiveRecord relation and apply pagination
       friends_records_relation = user.friends_sleep_records
+
+      if start_date.present? && end_date.present?
+        friends_records_relation = friends_records_relation.where(clock_in_at: start_date..end_date)
+      elsif start_date.present?
+        friends_records_relation = friends_records_relation.where('clock_in_at >= ?', start_date)
+      elsif end_date.present?
+        friends_records_relation = friends_records_relation.where('clock_in_at <= ?', end_date)
+      end
+
       paginated_friends_records = friends_records_relation.page(page).per(per_page)
       
       ServiceResult.new(

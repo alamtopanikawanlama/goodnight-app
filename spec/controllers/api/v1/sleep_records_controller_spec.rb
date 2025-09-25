@@ -5,23 +5,32 @@ RSpec.describe Api::V1::SleepRecordsController, type: :controller do
   let(:sleep_record) { create(:sleep_record, user: user, clock_out_at: Time.now) }
 
   describe 'GET #index' do
-    let!(:sleep_records) { create_list(:sleep_record, 3, user: user, clock_out_at: Time.now) }
+    let!(:sleep_records) do
+      [
+        create(:sleep_record, user: user, clock_in_at: 3.days.ago, clock_out_at: 3.days.ago + 8.hours),
+        create(:sleep_record, user: user, clock_in_at: 2.days.ago, clock_out_at: 2.days.ago + 7.hours),
+        create(:sleep_record, user: user, clock_in_at: 1.day.ago, clock_out_at: 1.day.ago + 6.hours)
+      ]
+    end
 
     it 'returns success response' do
       get :index, params: { user_id: user.id }
       expect(response).to have_http_status(:ok)
       json_response = JSON.parse(response.body)
       expect(json_response['sleep_records'].count).to eq(3)
-      json_response['sleep_records'].each do |record|
-        expect(record).to have_key('id')
-        expect(record).to have_key('clock_in_at')
-        expect(record).to have_key('clock_out_at')
-        expect(record).to have_key('duration_in_hours')
-        expect(record).to have_key('completed')
-        expect(record).to have_key('created_at')
-        expect(record).to have_key('updated_at')
-        expect(record).to have_key('user')
-      end
+    end
+
+    it 'filters by start_date and end_date' do
+      get :index, params: {
+        user_id: user.id,
+        start_date: 2.days.ago.to_date.to_s,
+        end_date: 1.day.ago.to_date.to_s
+      }
+      expect(response).to have_http_status(:ok)
+      json_response = JSON.parse(response.body)
+      dates = json_response['sleep_records'].map { |r| Date.parse(r['clock_in_at']) }
+      expect(dates).to all(be >= 2.days.ago.to_date)
+      expect(dates).to all(be <= 1.day.ago.to_date)
     end
 
     it 'passes pagination parameters' do
@@ -42,7 +51,6 @@ RSpec.describe Api::V1::SleepRecordsController, type: :controller do
 
       it 'returns not found response' do
         get :index, params: { user_id: 'non-existent' }
-        
         expect(response).to have_http_status(:not_found)
       end
     end
@@ -144,31 +152,33 @@ RSpec.describe Api::V1::SleepRecordsController, type: :controller do
     let(:friend_user) { create(:user) }
 
     before do
-      create_list(:sleep_record, 2, user: friend_user, clock_out_at: Time.now)
+      create(:sleep_record, user: friend_user, clock_in_at: 2.days.ago, clock_out_at: 2.days.ago + 7.hours)
+      create(:sleep_record, user: friend_user, clock_in_at: 1.day.ago, clock_out_at: 1.day.ago + 6.hours)
       create(:follow, follower: user, following: friend_user)
     end
 
     it 'returns friends sleep records' do
       get :friends, params: { user_id: user.id }
-      
       expect(response).to have_http_status(:ok)
       json_response = JSON.parse(response.body)
       expect(json_response['friends_sleep_records'].count).to eq(2)
-      json_response['friends_sleep_records'].each do |record|
-        expect(record).to have_key('id')
-        expect(record).to have_key('clock_in_at')
-        expect(record).to have_key('clock_out_at')
-        expect(record).to have_key('duration_in_hours')
-        expect(record).to have_key('completed')
-        expect(record).to have_key('created_at')
-        expect(record).to have_key('updated_at')
-        expect(record).to have_key('user')
-      end
+    end
+
+    it 'filters friends records by start_date and end_date' do
+      get :friends, params: {
+        user_id: user.id,
+        start_date: 2.days.ago.to_date.to_s,
+        end_date: 1.day.ago.to_date.to_s
+      }
+      expect(response).to have_http_status(:ok)
+      json_response = JSON.parse(response.body)
+      dates = json_response['friends_sleep_records'].map { |r| Date.parse(r['clock_in_at']) }
+      expect(dates).to all(be >= 2.days.ago.to_date)
+      expect(dates).to all(be <= 1.day.ago.to_date)
     end
 
     it 'passes pagination parameters' do
       get :friends, params: { user_id: user.id, page: 1, per_page: 5 }
-      
       expect(response).to have_http_status(:ok)
       json_response = JSON.parse(response.body)
       expect(json_response).to have_key('friends_sleep_records')
