@@ -99,15 +99,13 @@ RSpec.describe Api::V1::UsersController, type: :controller do
     context 'when user exists' do
       it 'deletes user successfully' do
         delete :destroy, params: { id: user.id }
-        
-        expect(response).to have_http_status(:ok)
+        expect(response).to have_http_status(:no_content) # ubah dari :ok ke :no_content (204)
       end
     end
 
     context 'when user does not exist' do
       it 'returns not found response' do
         delete :destroy, params: { id: 'non-existent' }
-        
         expect(response).to have_http_status(:not_found)
       end
     end
@@ -126,10 +124,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
   describe 'DELETE #unfollow' do
     it 'unfollows user successfully' do
       delete :unfollow, params: { id: user.id, target_user_id: other_user.id }
-      
-      expect(response).to have_http_status(:ok)
-      json_response = JSON.parse(response.body)
-      expect(json_response['message']).to eq('Successfully unfollowed user')
+      expect(response).to have_http_status(:no_content) # ubah dari :ok ke :no_content (204)
     end
   end
 

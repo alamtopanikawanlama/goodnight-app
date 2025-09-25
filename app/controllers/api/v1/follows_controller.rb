@@ -44,7 +44,7 @@ class Api::V1::FollowsController < Api::V1::BaseController
     result = FollowService.destroy(params[:id])
     Rails.cache.delete_matched("follows/*")
     if result.success?
-      render_success(nil, result.message)
+      head :no_content # status 204
     else
       render_error(result.message, :not_found)
     end

@@ -1,0 +1,789 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API V1",
+    "version": "v1"
+  },
+  "components": {
+    "schemas": {
+      "user": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "followers_count": {
+            "type": "integer"
+          },
+          "following_count": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date_time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date_time"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "follow": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "follower": {
+            "$ref": "#/components/schemas/user"
+          },
+          "following": {
+            "$ref": "#/components/schemas/user"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date_time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date_time"
+          }
+        },
+        "required": [
+          "id",
+          "follower",
+          "following"
+        ]
+      },
+      "sleep_record": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "clock_in_at": {
+            "type": "string",
+            "format": "date_time"
+          },
+          "clock_out_at": {
+            "type": "string",
+            "format": "date_time",
+            "nullable": true
+          },
+          "duration_in_hours": {
+            "type": "number",
+            "format": "float"
+          },
+          "completed": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date_time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date_time"
+          },
+          "user": {
+            "$ref": "#/components/schemas/user"
+          }
+        },
+        "required": [
+          "id",
+          "clock_in_at",
+          "created_at",
+          "updated_at",
+          "user"
+        ]
+      }
+    }
+  },
+  "paths": {
+    "/api/v1/follows": {
+      "get": {
+        "summary": "Retrieves all follows",
+        "tags": [
+          "Follows"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "follows found"
+          }
+        }
+      },
+      "post": {
+        "summary": "Creates a follow",
+        "tags": [
+          "Follows"
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "follow created"
+          },
+          "422": {
+            "description": "invalid request"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "follower_id": {
+                    "type": "string"
+                  },
+                  "following_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "follower_id",
+                  "following_id"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/follows/{id}": {
+      "get": {
+        "summary": "Retrieves a follow",
+        "tags": [
+          "Follows"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "follow found"
+          },
+          "404": {
+            "description": "follow not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletes a follow",
+        "tags": [
+          "Follows"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "follow deleted"
+          },
+          "404": {
+            "description": "follow not found"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{user_id}/sleep_records": {
+      "get": {
+        "summary": "Retrieves all sleep records for a user",
+        "tags": [
+          "SleepRecords"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "sleep records found"
+          },
+          "404": {
+            "description": "user not found"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{user_id}/sleep_records/{id}": {
+      "get": {
+        "summary": "Retrieves a sleep record",
+        "tags": [
+          "SleepRecords"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "sleep record found"
+          },
+          "404": {
+            "description": "sleep record not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletes a sleep record",
+        "tags": [
+          "SleepRecords"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "sleep record deleted"
+          },
+          "404": {
+            "description": "sleep record not found"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{user_id}/sleep_records/clock_in": {
+      "post": {
+        "summary": "Clock in for sleep",
+        "tags": [
+          "SleepRecords"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "clocked in"
+          },
+          "400": {
+            "description": "already clocked in"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{user_id}/sleep_records/clock_out": {
+      "post": {
+        "summary": "Clock out for sleep",
+        "tags": [
+          "SleepRecords"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "clocked out"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{user_id}/sleep_records/current": {
+      "get": {
+        "summary": "Retrieves current sleep record",
+        "tags": [
+          "SleepRecords"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "current sleep record found"
+          },
+          "404": {
+            "description": "no current sleep record"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{user_id}/sleep_records/friends": {
+      "get": {
+        "summary": "Retrieves friends sleep records",
+        "tags": [
+          "SleepRecords"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "friends sleep records found"
+          }
+        }
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "summary": "Retrieves all users",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "users found"
+          }
+        }
+      },
+      "post": {
+        "summary": "Creates a user",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "user created"
+          },
+          "422": {
+            "description": "invalid request"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}": {
+      "get": {
+        "summary": "Retrieves a user",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "user found"
+          },
+          "404": {
+            "description": "user not found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Updates a user",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "user updated"
+          },
+          "422": {
+            "description": "invalid request"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Updates a user",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "user updated"
+          },
+          "422": {
+            "description": "invalid request"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletes a user",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "user deleted"
+          },
+          "404": {
+            "description": "user not found"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}/follow": {
+      "post": {
+        "summary": "Follow a user",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "target_user_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "followed user"
+          },
+          "400": {
+            "description": "user invalid"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}/unfollow": {
+      "delete": {
+        "summary": "Unfollow a user",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "target_user_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "unfollowed user"
+          },
+          "400": {
+            "description": "user invalid"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}/followers": {
+      "get": {
+        "summary": "Retrieves user followers",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "followers found"
+          },
+          "404": {
+            "description": "user not found"
+          }
+        }
+      }
+    },
+    "/api/v1/users/{id}/following": {
+      "get": {
+        "summary": "Retrieves users being followed",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "following found"
+          },
+          "404": {
+            "description": "user not found"
+          }
+        }
+      }
+    }
+  }
+}

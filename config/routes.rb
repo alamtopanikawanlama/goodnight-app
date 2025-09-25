@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  mount Rswag::Ui::Engine => '/api-docs'
+  mount Rswag::Api::Engine => '/api-docs'
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -21,12 +23,9 @@ Rails.application.routes.draw do
         resources :sleep_records, except: [:create, :update] do
           collection do
             post :clock_in
+            post :clock_out
             get :current
             get :friends
-          end
-          
-          member do
-            patch :clock_out
           end
         end
       end

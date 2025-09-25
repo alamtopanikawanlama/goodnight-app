@@ -98,7 +98,7 @@ class SleepRecordService < BaseService
 
     def destroy(user_id, sleep_record_id)
       user = User.find(user_id)
-      sleep_record = user.sleep_records.find(sleep_record_id)
+      sleep_record = SleepRecord.where(user_id: user.id).find(sleep_record_id)
       sleep_record.destroy
       
       ServiceResult.new(success: true, message: 'Sleep record deleted successfully')

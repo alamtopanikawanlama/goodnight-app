@@ -59,7 +59,7 @@ class Api::V1::UsersController < Api::V1::BaseController
     result = UserService.destroy(params[:id])
     Rails.cache.delete_matched("users/*")
     if result.success?
-      render_success(nil, result.message)
+      head :no_content # status 204
     else
       render_error(result.message, :not_found)
     end
@@ -81,7 +81,7 @@ class Api::V1::UsersController < Api::V1::BaseController
     result = UserService.unfollow_user(params[:id], params[:target_user_id])
     Rails.cache.delete_matched("users/*")
     if result.success?
-      render_success(nil, result.message)
+      head :no_content # status 204
     else
       render_error(result.message)
     end

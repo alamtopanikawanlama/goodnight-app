@@ -90,14 +90,14 @@ RSpec.describe Api::V1::SleepRecordsController, type: :controller do
     end
   end
 
-  describe 'PATCH #clock_out' do
+  describe 'POST #clock_out' do
     context 'when clock out is successful' do
       before do
         create(:sleep_record, user: user, clock_out_at: nil)
       end
 
       it 'clocks out user successfully' do
-        patch :clock_out, params: { user_id: user.id, id: sleep_record.id }
+        post :clock_out, params: { user_id: user.id }
         
         expect(response).to have_http_status(:ok)
       end
@@ -111,7 +111,7 @@ RSpec.describe Api::V1::SleepRecordsController, type: :controller do
       end
 
       it 'returns bad request response' do
-        patch :clock_out, params: { user_id: user.id, id: sleep_record.id }
+        post :clock_out, params: { user_id: user.id }
         
         expect(response).to have_http_status(:bad_request)
       end
@@ -182,7 +182,7 @@ RSpec.describe Api::V1::SleepRecordsController, type: :controller do
       it 'deletes sleep record successfully' do
         delete :destroy, params: { user_id: user.id, id: sleep_record.id }
         
-        expect(response).to have_http_status(:ok)
+        expect(response).to have_http_status(204)
       end
     end
 

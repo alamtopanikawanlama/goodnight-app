@@ -94,8 +94,7 @@ RSpec.describe Api::V1::FollowsController, type: :controller do
       it 'deletes follow successfully' do
         delete :destroy, params: { id: follow.id }
         
-        expect(response).to have_http_status(:ok)
-        expect(JSON.parse(response.body)['message']).to eq('Follow relationship deleted successfully')
+        expect(response).to have_http_status(204)
       end
     end
 

@@ -92,9 +92,9 @@ class Api::V1::SleepRecordsController < Api::V1::BaseController
     result = SleepRecordService.destroy(params[:user_id], params[:id])
     Rails.cache.delete_matched("sleep_records/*#{params[:user_id]}*")
     if result.success?
-      render_success(nil, result.message)
-      return
+      head :no_content # status 204
+    else
+      render_error(result.message, :not_found)
     end
-    render_error(result.message, :not_found)
   end
 end
