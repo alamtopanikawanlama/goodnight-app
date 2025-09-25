@@ -81,3 +81,4 @@ bundle exec rspec
 ## API Documentation
 
 Swagger UI
+http://localhost:3001/api-docs/index.html
